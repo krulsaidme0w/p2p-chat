@@ -5,6 +5,7 @@ import (
 
 	"github.com/rivo/tview"
 
+	"p2p-messenger/internal/network"
 	"p2p-messenger/internal/ui"
 )
 
@@ -15,6 +16,9 @@ func main() {
 }
 
 func runUI() error {
+	networkManager := network.NewManager()
+	networkManager.Start()
+
 	app := ui.NewApp()
 	if err := tview.NewApplication().SetRoot(app.View, true).SetFocus(app.Sidebar.View).Run(); err != nil {
 		return err
