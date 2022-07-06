@@ -5,21 +5,28 @@ import (
 	"log"
 	"net"
 	"time"
+
+	"p2p-messenger/internal/entity"
+	"p2p-messenger/internal/proto"
+	"p2p-messenger/pkg/udp"
 )
 
 const (
 	udpConnectionBufferSize = 1024
+	multicastString         = "me0w"
 )
 
 type Discoverer struct {
 	Addr               *net.UDPAddr
 	MulticastFrequency time.Duration
+	Proto              *proto.Proto
 }
 
-func NewDiscoverer(addr *net.UDPAddr, multicastFrequency time.Duration) *Discoverer {
+func NewDiscoverer(addr *net.UDPAddr, multicastFrequency time.Duration, proto *proto.Proto) *Discoverer {
 	return &Discoverer{
 		Addr:               addr,
 		MulticastFrequency: multicastFrequency,
+		Proto:              proto,
 	}
 }
 
@@ -35,7 +42,10 @@ func (d *Discoverer) startMulticasting() {
 	}
 
 	for {
-		_, err := conn.Write([]byte(fmt.Sprintf("meow:%v:%v", "key to communicate", "port to connect")))
+		_, err := conn.Write([]byte(fmt.Sprintf("%s:%s:%s",
+			multicastString,
+			d.Proto.Name,
+			d.Proto.DH.PublicKey)))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -56,14 +66,16 @@ func (d *Discoverer) listenMulticasting() {
 	}
 
 	for {
-		buffer := make([]byte, 0, udpConnectionBufferSize)
-
-		_, src, err := conn.ReadFromUDP(buffer)
+		rawBytes, addr, err := udp.ReadFromUDPConnection(conn, udpConnectionBufferSize)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		//work with buffer
-		fmt.Println(src.IP, string(buffer))
+		message, err := entity.UdpMulticastMessageToPeer(rawBytes)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(message.MulticastString, message.Name, addr)
 	}
 }

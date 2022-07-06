@@ -1,12 +1,19 @@
 package network
 
+import (
+	"p2p-messenger/internal/proto"
+)
+
 type Listener struct {
+	Proto *proto.Proto
 }
 
-func NewListener() *Listener {
-	return &Listener{}
+func NewListener(proto *proto.Proto) *Listener {
+	return &Listener{
+		Proto: proto,
+	}
 }
 
-func (l *Listener) Listen() {
+func (l *Listener) Start() {
 
 }

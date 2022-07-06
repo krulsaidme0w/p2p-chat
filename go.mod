@@ -8,6 +8,8 @@ require (
 )
 
 require (
+	github.com/WolframAlph/dh v1.0.0
+	github.com/bxcodec/faker/v3 v3.8.0
 	github.com/gdamore/encoding v1.0.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect

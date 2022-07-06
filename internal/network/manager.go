@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"time"
+
+	"p2p-messenger/internal/proto"
 )
 
 const (
@@ -14,11 +16,12 @@ const (
 )
 
 type Manager struct {
+	Proto      *proto.Proto
 	Listener   *Listener
 	Discoverer *Discoverer
 }
 
-func NewManager() *Manager {
+func NewManager(proto *proto.Proto) *Manager {
 	multicastAddr, err := net.ResolveUDPAddr(
 		"udp",
 		fmt.Sprintf("%s:%d", MulticastIP, Port))
@@ -27,8 +30,9 @@ func NewManager() *Manager {
 	}
 
 	return &Manager{
-		Listener:   NewListener(),
-		Discoverer: NewDiscoverer(multicastAddr, MulticastFrequency),
+		Proto:      proto,
+		Listener:   NewListener(proto),
+		Discoverer: NewDiscoverer(multicastAddr, MulticastFrequency, proto),
 	}
 }
 
