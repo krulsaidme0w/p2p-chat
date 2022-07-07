@@ -14,7 +14,8 @@ type Proto struct {
 
 func NewProto(name string) *Proto {
 	return &Proto{
-		Name: name,
-		DH:   dh.New(),
+		Name:  name,
+		DH:    dh.New(),
+		Peers: repository.NewPeerRepository(),
 	}
 }

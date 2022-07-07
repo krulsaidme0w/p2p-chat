@@ -76,6 +76,11 @@ func (d *Discoverer) listenMulticasting() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(message.MulticastString, message.Name, addr)
+		d.Proto.Peers.Add(&entity.Peer{
+			Name:    message.Name,
+			PubKey:  message.PubKey,
+			Conn:    nil,
+			UDPAddr: addr,
+		})
 	}
 }

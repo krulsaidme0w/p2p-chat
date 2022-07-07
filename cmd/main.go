@@ -12,24 +12,25 @@ import (
 )
 
 func main() {
-	runNetworkManager()
+	p := proto.NewProto(faker.Name())
 
-	if err := runUI(); err != nil {
+	runNetworkManager(p)
+
+	if err := runUI(p); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func runNetworkManager() {
-	p := proto.NewProto(faker.Name())
-
+func runNetworkManager(p *proto.Proto) {
 	networkManager := network.NewManager(p)
 	networkManager.Start()
 }
 
-func runUI() error {
-	app := ui.NewApp()
+func runUI(p *proto.Proto) error {
+	app := ui.NewApp(p)
 	if err := tview.NewApplication().SetRoot(app.View, true).SetFocus(app.Sidebar.View).Run(); err != nil {
 		return err
 	}
+
 	return nil
 }
