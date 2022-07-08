@@ -8,7 +8,7 @@ import (
 
 type Sidebar struct {
 	View     *tview.List
-	PeerRepo *repository.PeerRepository
+	peerRepo *repository.PeerRepository
 }
 
 func NewSidebar(peerRepo *repository.PeerRepository) *Sidebar {
@@ -17,15 +17,15 @@ func NewSidebar(peerRepo *repository.PeerRepository) *Sidebar {
 
 	return &Sidebar{
 		View:     view,
-		PeerRepo: peerRepo,
+		peerRepo: peerRepo,
 	}
 }
 
 func (s *Sidebar) Reprint() {
 	s.View.Clear()
 
-	for _, peer := range s.PeerRepo.GetPeers() {
+	for _, peer := range s.peerRepo.GetPeers() {
 		s.View.
-			AddItem(peer.Name, peer.UDPAddr.String(), 0, nil)
+			AddItem(peer.Name, peer.PubKey.String(), 0, nil)
 	}
 }

@@ -2,12 +2,14 @@ package entity
 
 import (
 	"math/big"
-	"net"
+
+	"github.com/gorilla/websocket"
 )
 
 type Peer struct {
-	Name    string
-	PubKey  *big.Int
-	Conn    *net.Conn
-	UDPAddr *net.UDPAddr
+	Name      string
+	PubKey    *big.Int
+	PubKeyStr string
+	Conn      *websocket.Conn
+	Port      string
 }

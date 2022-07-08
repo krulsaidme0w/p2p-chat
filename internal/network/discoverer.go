@@ -2,8 +2,10 @@ package network
 
 import (
 	"fmt"
+	"github.com/gorilla/websocket"
 	"log"
 	"net"
+	"net/url"
 	"time"
 
 	"p2p-messenger/internal/entity"
@@ -42,10 +44,11 @@ func (d *Discoverer) startMulticasting() {
 	}
 
 	for {
-		_, err := conn.Write([]byte(fmt.Sprintf("%s:%s:%s",
+		_, err := conn.Write([]byte(fmt.Sprintf("%s:%s:%s:%s",
 			multicastString,
 			d.Proto.Name,
-			d.Proto.DH.PublicKey)))
+			d.Proto.DH.PublicKey,
+			d.Proto.Port)))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -76,11 +79,27 @@ func (d *Discoverer) listenMulticasting() {
 			log.Fatal(err)
 		}
 
-		d.Proto.Peers.Add(&entity.Peer{
-			Name:    message.Name,
-			PubKey:  message.PubKey,
-			Conn:    nil,
-			UDPAddr: addr,
-		})
+		peer := &entity.Peer{
+			Name:      message.Name,
+			PubKey:    message.PubKey,
+			PubKeyStr: message.PubKeyStr,
+			Conn:      nil,
+			Port:      message.Port,
+		}
+
+		go d.connectToPeer(peer, fmt.Sprintf("%s:%s", addr.IP.String(), peer.Port))
 	}
+}
+
+func (d *Discoverer) connectToPeer(peer *entity.Peer, addr string) {
+	u := url.URL{Scheme: "ws", Host: addr, Path: "/chat"}
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		log.Fatal("dial:", err)
+	}
+
+	peer.Conn = c
+
+	d.Proto.Peers.Add(peer)
 }
