@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	BadMulticastMessage = errors.New("ErrorBadMulticastMessage")
+	ErrBadMulticastMessage = errors.New("ErrorBadMulticastMessage")
 )
 
 type MulticastMessage struct {
@@ -23,18 +23,18 @@ type MulticastMessage struct {
 	Port            string
 }
 
-func UdpMulticastMessageToPeer(bytes []byte) (*MulticastMessage, error) {
+func UDPMulticastMessageToPeer(bytes []byte) (*MulticastMessage, error) {
 	bytes = b.Trim(bytes, nullByte)
 	array := strings.Split(string(bytes), ":")
 
 	if len(array) != 4 {
-		return nil, BadMulticastMessage
+		return nil, ErrBadMulticastMessage
 	}
 
 	pubKey := new(big.Int)
 	pubKey, ok := pubKey.SetString(array[2], 10)
 	if !ok {
-		return nil, BadMulticastMessage
+		return nil, ErrBadMulticastMessage
 	}
 
 	return &MulticastMessage{

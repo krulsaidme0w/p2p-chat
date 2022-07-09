@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"strings"
 
 	"p2p-messenger/internal/entity"
 )
 
 const (
-	timeFormat = "15:04:05"
+	timeFormat        = "15:04:05"
+	maxMessagesInView = 100
 )
 
 type Chat struct {
@@ -40,17 +42,17 @@ func NewChat() *Chat {
 	}
 }
 
-func (c *Chat) RenderMessages(messages []*entity.Message) {
-	text := ""
-
-	for i := 0; i < 100; i++ {
-		text += "\n"
-	}
-
+func (c *Chat) RenderMessages(messages []*entity.Message, protoName string) {
+	text := strings.Repeat("\n", maxMessagesInView)
 	for _, message := range messages {
+		isAuthor := false
+		if message.Author == protoName {
+			isAuthor = true
+		}
+
 		text += fmt.Sprintf("%s %s: %s\n",
 			formatTime(message),
-			formatAuthor(message),
+			formatAuthor(message, isAuthor),
 			formatText(message))
 	}
 
@@ -62,7 +64,10 @@ func formatTime(message *entity.Message) string {
 	return fmt.Sprintf("%s%s", "[blue]", now.Format(timeFormat))
 }
 
-func formatAuthor(message *entity.Message) string {
+func formatAuthor(message *entity.Message, isAuthor bool) string {
+	if isAuthor {
+		return fmt.Sprintf("%s%s", "[green]", message.Author)
+	}
 	return fmt.Sprintf("%s%s", "[red]", message.Author)
 }
 

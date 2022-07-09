@@ -69,7 +69,16 @@ func (l *Listener) chat(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (l *Listener) meow(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	conn.Close()
+}
+
 func (l *Listener) Start() {
 	http.HandleFunc("/chat", l.chat)
+	http.HandleFunc("/meow", l.meow)
 	log.Fatal(http.ListenAndServe(l.addr, nil))
 }

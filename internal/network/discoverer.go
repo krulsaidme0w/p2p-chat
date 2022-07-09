@@ -72,7 +72,7 @@ func (d *Discoverer) listenMulticasting() {
 			log.Fatal(err)
 		}
 
-		message, err := entity.UdpMulticastMessageToPeer(rawBytes)
+		message, err := entity.UDPMulticastMessageToPeer(rawBytes)
 		if err != nil {
 			log.Fatal(err)
 		}

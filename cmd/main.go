@@ -1,9 +1,8 @@
 package main
 
 import (
+	"flag"
 	"log"
-
-	"github.com/bxcodec/faker/v3"
 
 	"p2p-messenger/internal/network"
 	"p2p-messenger/internal/proto"
@@ -15,7 +14,10 @@ const (
 )
 
 func main() {
-	p := proto.NewProto(faker.Name(), Port)
+	name := flag.String("name", "krulsaidme0w", "peers name")
+	flag.Parse()
+
+	p := proto.NewProto(*name, Port)
 
 	runNetworkManager(p)
 

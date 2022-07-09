@@ -113,7 +113,7 @@ func (app *App) initBindings() {
 
 func (app *App) renderMessages() {
 	if app.CurrentPeer != nil {
-		app.Chat.RenderMessages(app.CurrentPeer.Messages)
+		app.Chat.RenderMessages(app.CurrentPeer.Messages, app.Proto.Name)
 		app.Chat.View.SetTitle(app.CurrentPeer.Name)
 	}
 }

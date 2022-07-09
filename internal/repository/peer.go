@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"fmt"
+	"github.com/gorilla/websocket"
+	"net/url"
 	"sort"
 	"sync"
 	"time"
@@ -9,7 +12,7 @@ import (
 )
 
 const (
-	deletionTimeout = 1 * time.Second
+	peerValidationTimeOut = 1 * time.Second
 )
 
 type PeerRepository struct {
@@ -65,13 +68,21 @@ func (p *PeerRepository) GetPeers() []*entity.Peer {
 	return peersSlice
 }
 
-//func (p *PeerRepository) peersValidator() {
-//	ticker := time.NewTicker(validationFrequency)
-//
-//	go func() {
-//		for {
-//			<-ticker.C
-//
-//		}
-//	}()
-//}
+func (p *PeerRepository) peersValidator() {
+	ticker := time.NewTicker(peerValidationTimeOut)
+
+	go func() {
+		for {
+			<-ticker.C
+			for _, peer := range p.peers {
+				u := url.URL{Scheme: "ws", Host: fmt.Sprintf("%s:%s", peer.AddrIP, peer.Port), Path: "/meow"}
+
+				c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+				defer c.Close()
+				if err != nil {
+					p.Delete(peer.PubKeyStr)
+				}
+			}
+		}
+	}()
+}

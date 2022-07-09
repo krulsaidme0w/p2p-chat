@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  peer_1:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "25042:25042"
+    restart: unless-stopped
+    networks:
+      - pet
+
+  peer_2:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "25042:25043"
+    restart: unless-stopped
+    networks:
+      - pet
+
+networks:
+  pet:
+    name: pet
