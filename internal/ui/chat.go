@@ -1,10 +1,15 @@
 package ui
 
 import (
+	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
 	"p2p-messenger/internal/entity"
+)
+
+const (
+	timeFormat = "15:04:05"
 )
 
 type Chat struct {
@@ -39,16 +44,28 @@ func (c *Chat) RenderMessages(messages []*entity.Message) {
 	text := ""
 
 	for i := 0; i < 100; i++ {
-		text += " \n"
+		text += "\n"
 	}
 
 	for _, message := range messages {
-		text += message.Time.String() + " " + message.Author + " " + message.Text + "\n"
+		text += fmt.Sprintf("%s %s: %s\n",
+			formatTime(message),
+			formatAuthor(message),
+			formatText(message))
 	}
 
-	//for i := 0; i < 100; i++ {
-	//	text += " \n"
-	//}
-
 	c.Messages.SetText(text[:len(text)-1]).ScrollToEnd()
+}
+
+func formatTime(message *entity.Message) string {
+	now := message.Time.UTC()
+	return fmt.Sprintf("%s%s", "[blue]", now.Format(timeFormat))
+}
+
+func formatAuthor(message *entity.Message) string {
+	return fmt.Sprintf("%s%s", "[red]", message.Author)
+}
+
+func formatText(message *entity.Message) string {
+	return fmt.Sprintf("%s%s", "[white]", message.Text)
 }

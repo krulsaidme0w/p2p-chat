@@ -2,7 +2,9 @@ package network
 
 import (
 	"log"
+	"math/big"
 	"net/http"
+	"p2p-messenger/internal/crypto"
 	"strings"
 
 	"p2p-messenger/internal/proto"
@@ -44,15 +46,26 @@ func (l *Listener) chat(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		pubKey := arr[0]
+		pubKeyStr := arr[0]
 		messageText := arr[1]
 
-		peer, found := l.proto.Peers.Get(pubKey)
+		peer, found := l.proto.Peers.Get(pubKeyStr)
 		if !found {
 			continue
 		}
 
-		peer.AddMessage(messageText, peer.Name)
+		pubKey := new(big.Int)
+		pubKey, ok := pubKey.SetString(pubKeyStr, 10)
+		if !ok {
+			continue
+		}
+
+		decryptedMessage, err := crypto.DecryptMessage(crypto.GetSecret(pubKey, l.proto.DH), messageText)
+		if err != nil {
+			continue
+		}
+
+		peer.AddMessage(decryptedMessage, peer.Name)
 	}
 }
 

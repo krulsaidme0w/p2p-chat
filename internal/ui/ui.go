@@ -94,12 +94,13 @@ func (app *App) initBindings() {
 		}
 
 		if event.Key() == tcell.KeyEnter {
-			if app.CurrentPeer == nil {
+			if app.CurrentPeer == nil || app.Chat.InputField.GetText() == "" {
 				return event
 			}
 
 			if err := app.CurrentPeer.SendMessage(app.Proto.DH.PublicKey.String(),
-				app.Chat.InputField.GetText()); err != nil {
+				app.Chat.InputField.GetText(),
+				app.Proto.DH); err != nil {
 				log.Fatal(err)
 			}
 
@@ -113,6 +114,7 @@ func (app *App) initBindings() {
 func (app *App) renderMessages() {
 	if app.CurrentPeer != nil {
 		app.Chat.RenderMessages(app.CurrentPeer.Messages)
+		app.Chat.View.SetTitle(app.CurrentPeer.Name)
 	}
 }
 
