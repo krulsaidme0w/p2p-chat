@@ -9,7 +9,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
+var (
+	upgrader = websocket.Upgrader{}
+)
 
 type Listener struct {
 	proto *proto.Proto
@@ -34,7 +36,6 @@ func chat(w http.ResponseWriter, r *http.Request) {
 		messageType, message, err := conn.ReadMessage()
 		if err != nil {
 			break
-
 		}
 
 		err = conn.WriteMessage(messageType, message)

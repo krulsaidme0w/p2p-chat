@@ -85,6 +85,7 @@ func (d *Discoverer) listenMulticasting() {
 			PubKeyStr: message.PubKeyStr,
 			Conn:      nil,
 			Port:      message.Port,
+			Messages:  make([]*entity.Message, 0),
 		}
 
 		go d.connectToPeer(peer, fmt.Sprintf("%s:%s", addr.IP.String(), peer.Port))

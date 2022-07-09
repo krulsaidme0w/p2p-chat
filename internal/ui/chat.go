@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"p2p-messenger/internal/entity"
 )
 
 type Chat struct {
@@ -31,4 +32,13 @@ func NewChat() *Chat {
 		InputField: inputField,
 		Messages:   messages,
 	}
+}
+
+func (c *Chat) RenderMessages(messages []*entity.Message) {
+	text := ""
+	for _, message := range messages {
+		text += message.Time.String() + " " + message.Author + " " + message.Text + "\n"
+	}
+
+	c.Messages.SetText(text)
 }

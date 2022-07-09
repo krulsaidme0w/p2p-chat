@@ -2,6 +2,7 @@ package ui
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"p2p-messenger/internal/entity"
 	"time"
 
 	"github.com/rivo/tview"
@@ -14,22 +15,24 @@ const (
 )
 
 type App struct {
-	Proto     *proto.Proto
-	Chat      *Chat
-	Sidebar   *Sidebar
-	InfoField *InformationField
-	View      *tview.Flex
-	UI        *tview.Application
+	Proto       *proto.Proto
+	Chat        *Chat
+	Sidebar     *Sidebar
+	InfoField   *InformationField
+	View        *tview.Flex
+	UI          *tview.Application
+	CurrentPeer *entity.Peer
 }
 
 func NewApp(proto *proto.Proto) *App {
 	app := &App{
-		Proto:     proto,
-		Chat:      NewChat(),
-		Sidebar:   NewSidebar(proto.Peers),
-		InfoField: NewInformationField(),
-		View:      tview.NewFlex(),
-		UI:        tview.NewApplication(),
+		Proto:       proto,
+		Chat:        NewChat(),
+		Sidebar:     NewSidebar(proto.Peers),
+		InfoField:   NewInformationField(),
+		View:        tview.NewFlex(),
+		UI:          tview.NewApplication(),
+		CurrentPeer: nil,
 	}
 
 	app.initView()
@@ -65,7 +68,8 @@ func (app *App) initBindings() {
 
 		if event.Key() == tcell.KeyEnter {
 			if app.Sidebar.View.GetItemCount() > 0 {
-				app.renderMessages()
+				app.CurrentPeer = app.getCurrentPeer()
+				app.UI.SetFocus(app.Chat.Messages)
 			}
 		}
 
@@ -89,8 +93,10 @@ func (app *App) initBindings() {
 		}
 
 		if event.Key() == tcell.KeyEnter {
+			//message sending
+			app.CurrentPeer.AddMessage(app.Chat.InputField.GetText(), app.Proto.Name)
+
 			app.Chat.InputField.SetText("")
-			app.UI.SetFocus(app.Chat.Messages)
 		}
 
 		return event
@@ -98,16 +104,21 @@ func (app *App) initBindings() {
 }
 
 func (app *App) renderMessages() {
-	app.Chat.Messages.Clear()
+	if app.CurrentPeer != nil {
+		app.Chat.RenderMessages(app.CurrentPeer.Messages)
+	}
+}
 
+func (app *App) getCurrentPeer() *entity.Peer {
 	_, pubKey := app.Sidebar.View.GetItemText(
 		app.Sidebar.View.GetCurrentItem())
 
-	peer, _ := app.Proto.Peers.Get(pubKey)
+	peer, found := app.Proto.Peers.Get(pubKey)
+	if !found {
+		return nil
+	}
 
-	app.Chat.Messages.SetText(peer.Name)
-
-	app.UI.SetFocus(app.Chat.Messages)
+	return peer
 }
 
 func (app *App) run() {
@@ -117,6 +128,7 @@ func (app *App) run() {
 		for {
 			<-ticker.C
 			app.UI.QueueUpdateDraw(app.Sidebar.Reprint)
+			app.UI.QueueUpdateDraw(app.renderMessages)
 		}
 	}()
 }
