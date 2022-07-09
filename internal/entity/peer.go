@@ -2,22 +2,24 @@ package entity
 
 import (
 	"fmt"
-	"github.com/WolframAlph/dh"
 	"log"
 	"math/big"
-	"p2p-messenger/internal/crypto"
+	"net/url"
 	"time"
 
+	"github.com/WolframAlph/dh"
 	"github.com/gorilla/websocket"
+
+	"p2p-messenger/internal/crypto"
 )
 
 type Peer struct {
 	Name      string
 	PubKey    *big.Int
 	PubKeyStr string
-	Conn      *websocket.Conn
 	Port      string
 	Messages  []*Message
+	AddrIP    string
 }
 
 func (p *Peer) AddMessage(text, author string) {
@@ -29,10 +31,18 @@ func (p *Peer) AddMessage(text, author string) {
 }
 
 func (p *Peer) SendMessage(pubKey, message string, dh dh.DiffieHellman) error {
+	u := url.URL{Scheme: "ws", Host: fmt.Sprintf("%s:%s", p.AddrIP, p.Port), Path: "/chat"}
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	defer c.Close()
+	if err != nil {
+		log.Fatal("dial:", err)
+	}
+
 	encryptedMessage, err := crypto.EncryptMessage(crypto.GetSecret(p.PubKey, dh), message)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return p.Conn.WriteMessage(1, []byte(fmt.Sprintf("%s:%s", pubKey, encryptedMessage)))
+	return c.WriteMessage(1, []byte(fmt.Sprintf("%s:%s", pubKey, encryptedMessage)))
 }

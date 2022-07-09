@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"sort"
 	"sync"
 	"time"
@@ -10,7 +9,7 @@ import (
 )
 
 const (
-	validationFrequency = 100 * time.Millisecond
+	deletionTimeout = 1 * time.Second
 )
 
 type PeerRepository struct {
@@ -23,8 +22,6 @@ func NewPeerRepository() *PeerRepository {
 		rwMutex: &sync.RWMutex{},
 		peers:   make(map[string]*entity.Peer),
 	}
-
-	peerRepository.peersValidator()
 
 	return peerRepository
 }
@@ -68,18 +65,13 @@ func (p *PeerRepository) GetPeers() []*entity.Peer {
 	return peersSlice
 }
 
-func (p *PeerRepository) peersValidator() {
-	ticker := time.NewTicker(validationFrequency)
-
-	go func() {
-		for {
-			<-ticker.C
-			for _, peer := range p.peers {
-				if peer.Conn == nil {
-					fmt.Println(peer.Name)
-					p.Delete(peer.PubKeyStr)
-				}
-			}
-		}
-	}()
-}
+//func (p *PeerRepository) peersValidator() {
+//	ticker := time.NewTicker(validationFrequency)
+//
+//	go func() {
+//		for {
+//			<-ticker.C
+//
+//		}
+//	}()
+//}

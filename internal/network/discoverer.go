@@ -2,10 +2,8 @@ package network
 
 import (
 	"fmt"
-	"github.com/gorilla/websocket"
 	"log"
 	"net"
-	"net/url"
 	"time"
 
 	"p2p-messenger/internal/entity"
@@ -83,24 +81,11 @@ func (d *Discoverer) listenMulticasting() {
 			Name:      message.Name,
 			PubKey:    message.PubKey,
 			PubKeyStr: message.PubKeyStr,
-			Conn:      nil,
 			Port:      message.Port,
 			Messages:  make([]*entity.Message, 0),
+			AddrIP:    addr.IP.String(),
 		}
 
-		go d.connectToPeer(peer, fmt.Sprintf("%s:%s", addr.IP.String(), peer.Port))
+		d.Proto.Peers.Add(peer)
 	}
-}
-
-func (d *Discoverer) connectToPeer(peer *entity.Peer, addr string) {
-	u := url.URL{Scheme: "ws", Host: addr, Path: "/chat"}
-
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-	if err != nil {
-		log.Fatal("dial:", err)
-	}
-
-	peer.Conn = c
-
-	d.Proto.Peers.Add(peer)
 }
