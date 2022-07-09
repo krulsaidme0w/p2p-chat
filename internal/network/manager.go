@@ -39,6 +39,6 @@ func NewManager(proto *proto.Proto) *Manager {
 }
 
 func (m *Manager) Start() {
-	go m.Discoverer.Start()
 	go m.Listener.Start()
+	go m.Discoverer.Start()
 }

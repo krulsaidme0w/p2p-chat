@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+
 	"p2p-messenger/internal/entity"
 )
 
@@ -36,9 +37,18 @@ func NewChat() *Chat {
 
 func (c *Chat) RenderMessages(messages []*entity.Message) {
 	text := ""
+
+	for i := 0; i < 100; i++ {
+		text += " \n"
+	}
+
 	for _, message := range messages {
 		text += message.Time.String() + " " + message.Author + " " + message.Text + "\n"
 	}
 
-	c.Messages.SetText(text)
+	//for i := 0; i < 100; i++ {
+	//	text += " \n"
+	//}
+
+	c.Messages.SetText(text[:len(text)-1]).ScrollToEnd()
 }

@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"fmt"
 	"math/big"
 	"time"
 
@@ -22,4 +23,8 @@ func (p *Peer) AddMessage(text, author string) {
 		Text:   text,
 		Author: author,
 	})
+}
+
+func (p *Peer) SendMessage(pubKey, message string) error {
+	return p.Conn.WriteMessage(1, []byte(fmt.Sprintf("%s:%s", pubKey, message)))
 }

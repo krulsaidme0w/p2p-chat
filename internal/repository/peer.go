@@ -23,7 +23,10 @@ func (p *PeerRepository) Add(peer *entity.Peer) {
 	p.rwMutex.Lock()
 	defer p.rwMutex.Unlock()
 
-	p.peers[peer.PubKeyStr] = peer
+	_, found := p.peers[peer.PubKeyStr]
+	if !found {
+		p.peers[peer.PubKeyStr] = peer
+	}
 }
 
 func (p *PeerRepository) Delete(pubKey string) {
