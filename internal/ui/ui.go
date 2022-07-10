@@ -2,7 +2,6 @@ package ui
 
 import (
 	"github.com/gdamore/tcell/v2"
-	"log"
 	"p2p-messenger/internal/entity"
 	"time"
 
@@ -98,10 +97,18 @@ func (app *App) initBindings() {
 				return event
 			}
 
-			if err := app.CurrentPeer.SendMessage(app.Proto.DH.PublicKey.String(),
-				app.Chat.InputField.GetText(),
+			message := app.Chat.InputField.GetText()
+			peer := app.CurrentPeer
+			if err := peer.SendMessage(app.Proto.DH.PublicKey.String(),
+				message,
 				app.Proto.DH); err != nil {
-				log.Fatal(err)
+				app.Proto.Peers.Delete(peer.PubKeyStr)
+				app.Chat.View.SetTitle("chat")
+				app.Chat.Messages.SetText("")
+				app.CurrentPeer = nil
+				app.UI.SetFocus(app.Sidebar.View)
+			} else {
+				app.CurrentPeer.AddMessage(message, app.Proto.Name)
 			}
 
 			app.Chat.InputField.SetText("")

@@ -26,6 +26,8 @@ func NewPeerRepository() *PeerRepository {
 		peers:   make(map[string]*entity.Peer),
 	}
 
+	peerRepository.peersValidator()
+
 	return peerRepository
 }
 
@@ -77,11 +79,12 @@ func (p *PeerRepository) peersValidator() {
 			for _, peer := range p.peers {
 				u := url.URL{Scheme: "ws", Host: fmt.Sprintf("%s:%s", peer.AddrIP, peer.Port), Path: "/meow"}
 
-				c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-				defer c.Close()
-				if err != nil {
+				c, _, _ := websocket.DefaultDialer.Dial(u.String(), nil)
+				if c == nil {
 					p.Delete(peer.PubKeyStr)
+					continue
 				}
+				c.Close()
 			}
 		}
 	}()

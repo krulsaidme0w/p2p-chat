@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -11,6 +12,10 @@ import (
 	"github.com/gorilla/websocket"
 
 	"p2p-messenger/internal/crypto"
+)
+
+var (
+	ErrPeerIsDeleted = errors.New("peer disconnected")
 )
 
 type Peer struct {
@@ -34,9 +39,13 @@ func (p *Peer) SendMessage(pubKey, message string, dh dh.DiffieHellman) error {
 	u := url.URL{Scheme: "ws", Host: fmt.Sprintf("%s:%s", p.AddrIP, p.Port), Path: "/chat"}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if c == nil {
+		return ErrPeerIsDeleted
+	}
+
 	defer c.Close()
 	if err != nil {
-		log.Fatal("dial:", err)
+		return err
 	}
 
 	encryptedMessage, err := crypto.EncryptMessage(crypto.GetSecret(p.PubKey, dh), message)

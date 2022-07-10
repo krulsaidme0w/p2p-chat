@@ -14,7 +14,7 @@ const (
 )
 
 func main() {
-	name := flag.String("name", "krulsaidme0w", "peers name")
+	name := flag.String("name", "krulsaidme0w", "peer's name")
 	flag.Parse()
 
 	p := proto.NewProto(*name, Port)

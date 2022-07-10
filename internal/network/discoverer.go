@@ -86,6 +86,8 @@ func (d *Discoverer) listenMulticasting() {
 			AddrIP:    addr.IP.String(),
 		}
 
-		d.Proto.Peers.Add(peer)
+		if peer.PubKeyStr != d.Proto.DH.PublicKey.String() {
+			d.Proto.Peers.Add(peer)
+		}
 	}
 }

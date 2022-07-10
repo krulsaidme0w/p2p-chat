@@ -1,4 +1,4 @@
-FROM golang:1.17-buster AS build
+FROM golang:1.18-buster AS build
 
 WORKDIR /app
 ADD . .
@@ -12,16 +12,12 @@ RUN go mod download
 
 RUN go build ./cmd/main.go
 
-FROM alpine:latest
-
-RUN apk upgrade --update-cache --available && \
-    rm -rf /var/cache/apk/*
+FROM sixeyed/ubuntu-with-utils
 
 WORKDIR /app
 
 COPY --from=build /app/ .
 ADD cmd .
 
-EXPOSE 25042
-
-CMD ["./main"]
+#ENTRYPOINT ["./main"]
+CMD ["ping", "google.com"]

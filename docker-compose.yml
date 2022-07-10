@@ -5,22 +5,24 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    ports:
-      - "25042:25042"
-    restart: unless-stopped
+    restart: "no"
     networks:
-      - pet
+      pet:
+        ipv4_address: 10.5.0.5
 
   peer_2:
     build:
       context: ./
       dockerfile: Dockerfile
-    ports:
-      - "25042:25043"
-    restart: unless-stopped
+    restart: "no"
     networks:
-      - pet
+      pet:
+        ipv4_address: 10.5.0.6
 
 networks:
   pet:
-    name: pet
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.5.0.0/16
+        gateway: 10.5.0.1
