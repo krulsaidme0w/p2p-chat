@@ -8,4 +8,4 @@ Run
 go run cmd/main.go -name krulsaidme0w
 ```
 
-My messenger discovers users using UDP, connects to them using websocket to encrypt/decrypt messages uses diffie-hellman algorithm.
+My messenger discovers users using UDP, connects to them using websocket to encrypt/decrypt messages uses diffie-hellman algorithm. For ui i used tview.
