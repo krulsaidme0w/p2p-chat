@@ -2,11 +2,12 @@ package repository
 
 import (
 	"fmt"
-	"github.com/gorilla/websocket"
 	"net/url"
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
 
 	"p2p-messenger/internal/entity"
 )

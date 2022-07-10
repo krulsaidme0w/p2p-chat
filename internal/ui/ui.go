@@ -1,12 +1,12 @@
 package ui
 
 import (
-	"github.com/gdamore/tcell/v2"
-	"p2p-messenger/internal/entity"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
+	"p2p-messenger/internal/entity"
 	"p2p-messenger/internal/proto"
 )
 

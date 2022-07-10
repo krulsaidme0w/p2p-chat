@@ -4,12 +4,12 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-	"p2p-messenger/internal/crypto"
 	"strings"
 
-	"p2p-messenger/internal/proto"
-
 	"github.com/gorilla/websocket"
+
+	"p2p-messenger/internal/crypto"
+	"p2p-messenger/internal/proto"
 )
 
 var (

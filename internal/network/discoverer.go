@@ -41,7 +41,9 @@ func (d *Discoverer) startMulticasting() {
 		log.Fatal(err)
 	}
 
+	ticker := time.NewTicker(d.MulticastFrequency)
 	for {
+		<-ticker.C
 		_, err := conn.Write([]byte(fmt.Sprintf("%s:%s:%s:%s",
 			multicastString,
 			d.Proto.Name,
@@ -50,8 +52,6 @@ func (d *Discoverer) startMulticasting() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		time.Sleep(d.MulticastFrequency)
 	}
 }
 
